@@ -764,3 +764,6 @@ function P.LocalizeTooltip(tip)
     tip.AddLine=function(self,text,...) return addLine(self,P.T(text),...) end
     tip.AddDoubleLine=function(self,left,right,...) return addDouble(self,P.T(left),P.T(right),...) end
 end
+
+translations.SK["Public release"]="Verejné vydanie"
+translations.CZ["Public release"]="Veřejné vydání"

@@ -217,7 +217,7 @@ function P.ToggleSettings()
         label(credits,entry[2],230,-422-(i-1)*30)
     end
     label(credits,"Training data: TrueshotLodge / chazlander (MIT)",42,-575):SetTextColor(.7,.68,.6)
-    label(credits,"Testing release",42,-607):SetTextColor(.7,.68,.6)
+    label(credits,"Public release",42,-607):SetTextColor(.7,.68,.6)
     P.ShowSettingsPage("general")
     P.RefreshSettings()
 end

@@ -44,7 +44,7 @@ Restart WoW, enable PetPulse Forever and log in on a Hunter. This build targets 
 
 ## What to expect
 
-The first public release is a **beta**. Core flows have been tested in game; 118 deterministic mock tests cover behavior, but cannot emulate all Blizzard secure UI behavior.
+Version 1.6.6 is the first public release. Core flows have been tested in game; 118 deterministic mock tests cover behavior, but cannot emulate all Blizzard secure UI behavior.
 
 Training and location catalogs may be incomplete or differ after updates. Map locations are recorded habitats, not live-spawn tracking. Learning an ability requires taming and using the source pet; killing a beast does not teach it. Training remains a manual action in the game's Beast Training interface. Same-name pets of the same family share a selector identity, so give distinct companions distinct names.
 
