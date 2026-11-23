@@ -1,0 +1,8 @@
+PetPulse Forever — Copyright 2026 Wixin. All rights reserved.
+
+Permission is granted to install and use official releases for personal gameplay.
+Redistribution or publication of modified versions requires the author's permission.
+Third-party components retain their original licenses; see THIRD-PARTY-NOTICES.txt.
+This notice does not restrict rights granted by those licenses. World of Warcraft
+and Blizzard assets belong to their respective owners. Client icons and fonts are
+referenced by the addon rather than bundled.

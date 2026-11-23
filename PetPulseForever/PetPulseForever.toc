@@ -1,0 +1,25 @@
+## Interface: 16001
+## Title: PetPulse Forever
+## Notes: A quiet pet shard for hunters. Smart feeding, verified training and ammunition.
+## Author: Wixin
+## Version: 1.6.6
+## OptionalDeps: QuestieDB
+## SavedVariablesPerCharacter: PetPulseForeverDB
+Core.lua
+Locale.lua
+Families.lua
+Model.lua
+FoodCatalog.lua
+QuestFood.lua
+QuestSafety.lua
+Food.lua
+FoodMenu.lua
+Training.lua
+TrainingCatalog.lua
+TrainingGuide.lua
+TrainingJourney.lua
+TrainingGuideUI.lua
+FoodDetails.lua
+HUD.lua
+Settings.lua
+Bootstrap.lua
