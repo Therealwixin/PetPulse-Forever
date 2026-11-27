@@ -8,7 +8,7 @@ local function reset()
     P.db.guide.focus="main";P.db.guide.pets.main={guid="main",name="Mittens",family="Cat",level=7,tp=100,spells={bite=1},active=1}
     UnitLevel=function(unit)return unit=="player" and 30 or P.pet.level end
     UnitFactionGroup=function()return "Alliance"end
-    IsPlayerSpell=function()return false end;C_SpellBook=nil;HasPetSpells=function()return 1 end
+    IsPlayerSpell=function()return false end;IsSpellKnown=nil;Enum.SpellBookSpellBank=nil;C_SpellBook=nil;HasPetSpells=function()return 1 end
     GetSpellBookItemInfo=function()return "SPELL",P.guideAbilities.bite.ranks[1].spell_id end
     C_Map={GetBestMapForUnit=function()return 1429 end,GetMapInfo=function(id)return {name="Zone "..id}end,
         GetPlayerMapPosition=function()return vector(.43,.66)end}
@@ -327,5 +327,60 @@ test("minimap hide toggle and combat click are safe",function()
     local b=P.minimapButton;P.db.minimap=false;P.UpdateMinimapButton();assert(not b:IsShown())
     P.db.minimap=true;P.UpdateMinimapButton();assert(b:IsShown())
     P.guideWindow:Hide();P.settings:Hide();NOW=NOW+1;COMBAT=true;b.scripts.OnClick(b,"LeftButton");assert(not P.settings:IsShown());COMBAT=false
+end)
+test("actionID-only modern pet spells suppress already known nearby ranks",function()
+    Enum.SpellBookSpellBank={Player=0,Pet=1}
+    C_SpellBook={HasPetSpells=function()return 1 end,
+        GetSpellBookItemInfo=function(_,bank)assert(bank==1);return {actionID=bite.spell_id+16777216} end}
+    G:Focus().level=20;G:Detect("mouseover")
+    assert(G:Focus().spells.bite==2 and not G.alerts[118])
+    assert(G:Known(bite)==false,"pet knowledge must not become hunter knowledge")
+end)
+test("current pet spell changes are checked before the delayed refresh",function()
+    G:Focus().level=20;GetSpellBookItemInfo=function()return "SPELL",bite.spell_id end
+    G:Detect("target");assert(not G.alerts[118])
+end)
+test("higher pet rank also suppresses lower source rank",function()
+    G:Focus().level=30
+    GetSpellBookItemInfo=function()return "SPELL",P.guideAbilities.bite.ranks[3].spell_id end
+    G:Detect("target");assert(not G.alerts[118])
+end)
+test("partial spellbook preserves snapshot and does not announce an upgrade",function()
+    G:Focus().level=20;G:Focus().spells.bite=2
+    HasPetSpells=function()return 2 end
+    GetSpellBookItemInfo=function(i)if i==1 then return "SPELL",bite.spell_id end end
+    assert(G:ReadPetSpells()==nil);G:Snapshot(false);assert(G:Focus().spells.bite==2)
+    G:Detect("target");assert(not G.alerts[118])
+end)
+test("legacy hunter teaching knowledge suppresses a taming alert",function()
+    G:Focus().level=20
+    IsSpellKnown=function(id,pet)assert(pet==false);return id==bite.learn_id end
+    G:Detect("target");assert(G:Known(bite)==true and not G.alerts[118])
+end)
+test("temporary pet spellbook does not overwrite selected main pet",function()
+    G:Focus().level=20;P.pet.guid="temporary"
+    UnitGUID=function(unit)return unit=="pet" and "temporary" or "Creature-0-0-0-0-118-12345"end
+    GetSpellBookItemInfo=function()return "SPELL",bite.spell_id end
+    G:Detect("target");assert(G:Focus().spells.bite==1 and G.alerts[118]==100)
+end)
+test("pinned HUD stays open outside cursor and unpin restores collapse",function()
+    P.db.hover=true;P.db.locked=true;CURSORX=0;CURSORY=0
+    P.SetPinnedOpen(true);P.UpdateHUD(P.hud,1);NOW=NOW+2;P.UpdateHUD(P.hud,1)
+    assert(P.expanded and P.progress==1 and P.hud.pin:IsShown())
+    P.hud.pin.scripts.OnClick();assert(not P.db.pinnedOpen)
+    P.UpdateHUD(P.hud,1);NOW=NOW+2;P.UpdateHUD(P.hud,1);P.UpdateHUD(P.hud,1)
+    assert(not P.expanded and P.progress==0)
+end)
+test("saved pin reopens HUD on layout and does not change hover preference",function()
+    P.db.hover=false;P.db.pinnedOpen=true;P.expanded=false;P.linear=0;P.progress=0
+    P.ApplyLayout();P.UpdateHUD(P.hud,1);assert(P.expanded and P.progress==1)
+    P.hud.center.scripts.OnClick(P.hud.center,"LeftButton");assert(P.expanded)
+    P.SetPinnedOpen(false);assert(P.db.hover==false)
+    P.hud.center.scripts.OnClick(P.hud.center,"LeftButton");assert(not P.expanded)
+    P.db.hover=true
+end)
+test("pin toggle in combat leaves protected actions untouched",function()
+    COMBAT=true;P.SetPinnedOpen(true);P.UpdateHUD(P.hud,1);assert(P.expanded)
+    P.SetPinnedOpen(false);COMBAT=false
 end)
 print("TOTAL "..n.." training guide tests passed")

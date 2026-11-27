@@ -2,7 +2,7 @@
 
 A companion HUD for Hunters and their pets in **World of Warcraft: Forever**.
 
-PetPulse keeps feeding, happiness, pet XP, training and ammunition close at hand. Hover over your pet portrait to open the controls, or use the minimap paw to open the settings.
+PetPulse keeps feeding, happiness, pet XP, training and ammunition close at hand. Hover over your pet portrait to open the controls, pin them open with Stick Open, or use the minimap paw to open the settings.
 
 ![PetPulse HUD](docs/screenshots/01-hud.png)
 
@@ -44,7 +44,7 @@ Restart WoW, enable PetPulse Forever and log in on a Hunter. This build targets 
 
 ## What to expect
 
-Version 1.6.6 is the first public release. Core flows have been tested in game; 118 deterministic mock tests cover behavior, but cannot emulate all Blizzard secure UI behavior.
+Current release: **1.6.7**. Core flows have been tested in game; 127 deterministic mock tests cover behavior, but cannot emulate all Blizzard secure UI behavior.
 
 Training and location catalogs may be incomplete or differ after updates. Map locations are recorded habitats, not live-spawn tracking. Learning an ability requires taming and using the source pet; killing a beast does not teach it. Training remains a manual action in the game's Beast Training interface. Same-name pets of the same family share a selector identity, so give distinct companions distinct names.
 

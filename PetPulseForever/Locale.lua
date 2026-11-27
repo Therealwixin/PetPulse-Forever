@@ -767,3 +767,11 @@ end
 
 translations.SK["Public release"]="Verejné vydanie"
 translations.CZ["Public release"]="Veřejné vydání"
+translations.SK["Stick Open"]="Nechať otvorené"
+translations.CZ["Stick Open"]="Nechat otevřené"
+translations.SK["Unpin HUD"]="Odopnúť HUD"
+translations.CZ["Unpin HUD"]="Odepnout HUD"
+translations.SK["Click to restore normal opening behaviour."]="Kliknutím obnovíš bežné otváranie."
+translations.CZ["Click to restore normal opening behaviour."]="Kliknutím obnovíš běžné otevírání."
+translations.SK["Keep the pet controls open, even when your mouse leaves."]="Ovládanie peta zostane otvorené aj po odchode myši."
+translations.CZ["Keep the pet controls open, even when your mouse leaves."]="Ovládání peta zůstane otevřené i po odchodu myši."

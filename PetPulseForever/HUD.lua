@@ -186,6 +186,12 @@ end
 function P.Layout(progress)
     P.hud.shard:SetAlpha(progress)
     P.hud.menu:SetShown(progress>.98 and P.db.locked)
+    if P.hud.pin then
+        P.hud.pin:SetShown(progress>.98 and P.db.locked)
+        for _,part in ipairs(P.hud.pin.parts) do
+            if P.db.pinnedOpen then part:SetVertexColor(1,.8,.35) else part:SetVertexColor(.7,.65,.54) end
+        end
+    end
     local plateSize=120+40*progress
     P.hud.shard:SetSize(plateSize,plateSize)
     if P.hud.meal then
@@ -216,8 +222,15 @@ function P.OpenShard()
     P.expanded=true; P.outsideAt=nil
     P.hud:SetScript("OnUpdate",P.UpdateHUD)
 end
+function P.SetPinnedOpen(enabled)
+    P.db.pinnedOpen=enabled==true
+    P.outsideAt=nil
+    if P.db.pinnedOpen then P.expanded=true end
+    P.Layout(P.progress)
+    P.hud:SetScript("OnUpdate",P.UpdateHUD)
+end
 function P.UpdateHUD(self,elapsed)
-    if not P.db.locked then P.expanded=true end
+    if not P.db.locked or P.db.pinnedOpen then P.expanded=true;P.outsideAt=nil end
     if P.foodMenu and P.foodMenu:IsShown() then P.expanded=true;P.outsideAt=nil end
     local target=P.expanded and 1 or 0
     local step=elapsed/math.max(.08,P.db.animation)
@@ -231,7 +244,7 @@ function P.UpdateHUD(self,elapsed)
         local x,y=GetCursorPosition(); local cx,cy=self:GetCenter(); local scale=self:GetEffectiveScale()
         local inside=(P.foodMenu and P.foodMenu:IsShown()) or (cx and P.Inside(x/scale-cx,y/scale-cy,90,P.expanded))
         if inside then P.outsideAt=nil
-        elseif P.expanded and P.db.hover and P.db.locked and not P.dragging then
+        elseif P.expanded and P.db.hover and P.db.locked and not P.db.pinnedOpen and not P.dragging then
             P.outsideAt=P.outsideAt or GetTime()
             if GetTime()-P.outsideAt>=P.db.delay then P.expanded=false; leave() end
         end
@@ -244,7 +257,7 @@ function P.ApplyLayout()
     P.hud:SetScale(P.db.scale); P.hud:SetAlpha(P.db.opacity)
     P.hud:ClearAllPoints(); P.hud:SetPoint("CENTER",UIParent,"CENTER",P.db.x,P.db.y)
     if P.hud.mover then P.hud.mover:SetShown(not P.db.locked) end
-    if not P.db.locked then
+    if not P.db.locked or P.db.pinnedOpen then
         P.expanded=true; P.hud:SetScript("OnUpdate",P.UpdateHUD)
     end
     P.Layout(P.progress)
@@ -358,7 +371,7 @@ function P.BuildHUD()
     f.center:RegisterForDrag("LeftButton")
     f.center:SetScript("OnClick",function(_,button)
         if button=="RightButton" then P.ToggleSettings()
-        elseif not P.db.hover then
+        elseif not P.db.hover and not P.db.pinnedOpen then
             P.expanded=not P.expanded; P.outsideAt=nil; f:SetScript("OnUpdate",P.UpdateHUD)
         end
     end)
@@ -424,7 +437,7 @@ function P.BuildHUD()
     P.petAction:SetScript("OnEnter",enter);P.petAction:SetScript("OnLeave",leave)
     P.petAction:HookScript("PostClick",function(_,button)
         if button=="RightButton" then P.ToggleSettings()
-        elseif not P.db.hover then P.expanded=not P.expanded;f:SetScript("OnUpdate",P.UpdateHUD) end
+        elseif not P.db.hover and not P.db.pinnedOpen then P.expanded=not P.expanded;f:SetScript("OnUpdate",P.UpdateHUD) end
     end)
     f.menu=CreateFrame("Button",nil,f,"BackdropTemplate")
     f.menu:SetSize(22,22);f.menu:SetPoint("CENTER",f,"CENTER",34,22)
@@ -444,6 +457,29 @@ function P.BuildHUD()
     f.menu:SetScript("OnLeave",function(self) self.plate:SetVertexColor(1,1,1);GameTooltip:Hide() end)
     f.menu:SetScript("OnClick",function() GameTooltip:Hide();P.ToggleSettings() end)
     f.menu:Hide()
+    f.pin=CreateFrame("Button",nil,f)
+    f.pin:SetSize(22,22);f.pin:SetPoint("CENTER",f,"CENTER",-34,22)
+    f.pin:SetFrameLevel(f:GetFrameLevel()+12)
+    f.pin.plate=f.pin:CreateTexture(nil,"BACKGROUND")
+    f.pin.plate:SetAllPoints();f.pin.plate:SetTexture(P.media.."menu-medallion.tga")
+    f.pin.parts={}
+    -- Small pushpin silhouette, using the same medallion as the settings button.
+    for _,shape in ipairs({{8,2,0,5},{5,5,0,2},{11,2,0,-1},{2,5,0,-4}}) do
+        local part=f.pin:CreateTexture(nil,"OVERLAY")
+        part:SetTexture("Interface\\Buttons\\WHITE8X8")
+        part:SetSize(shape[1],shape[2]);part:SetPoint("CENTER",shape[3],shape[4])
+        f.pin.parts[#f.pin.parts+1]=part
+    end
+    f.pin:SetScript("OnEnter",function(self)
+        P.OpenShard();self.plate:SetVertexColor(1.35,1.2,.85)
+        GameTooltip:SetOwner(self,"ANCHOR_LEFT")
+        GameTooltip:AddLine(P.T(P.db.pinnedOpen and "Unpin HUD" or "Stick Open"))
+        GameTooltip:AddLine(P.T(P.db.pinnedOpen and "Click to restore normal opening behaviour." or "Keep the pet controls open, even when your mouse leaves."),1,.9,.7,true)
+        P.SizeTooltipText();GameTooltip:Show()
+    end)
+    f.pin:SetScript("OnLeave",function(self) self.plate:SetVertexColor(1,1,1);GameTooltip:Hide() end)
+    f.pin:SetScript("OnClick",function() P.SetPinnedOpen(not P.db.pinnedOpen);GameTooltip:Hide() end)
+    f.pin:Hide()
     P.BuildHealthWarning()
     P.BuildCenterWarnings()
     -- Dedicated move mode: the entire visible shard is a drag handle, with no

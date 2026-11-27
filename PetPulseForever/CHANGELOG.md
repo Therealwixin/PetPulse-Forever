@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.7 — 2026-11-27
+
+- Fixed false nearby training alerts for abilities the selected pet already knows. Pet spellbook reading now handles actionID-only entries and preserves the last complete snapshot when data is temporarily unavailable.
+- Recheck the active main pet's spells and the hunter's teaching knowledge before showing a nearby training opportunity; added legacy knowledge API support without treating a temporary pet's abilities as hunter knowledge.
+- Added Stick Open: a pin button opposite the hamburger menu keeps the HUD expanded. Click again to restore normal opening behaviour. The choice is saved per character, with EN/SK/CZ tooltips.
+- Added "Mosal is King" beneath the Special Thanks in Credits.
+
 ## 1.6.6 — 2026-11-23
 
 - Back to settings button in Training Guide, retaining the previously selected settings tab.

@@ -1,11 +1,11 @@
 local _, P = ...
-P.version = "1.6.6"
-P.revision = "20261123.2"
-P.releaseDate = "2026-11-23"
+P.version = "1.6.7"
+P.revision = "20261127.1"
+P.releaseDate = "2026-11-27"
 P.targetInterface = 16001
 P.media = "Interface\\AddOns\\PetPulseForever\\Media\\"
 P.defaults = {minimap=true,minimapAngle=225,ammoBelow=true, ammoFont="classic", ammoR=1, ammoG=.94, ammoB=.78, language="EN", moodStyle="wolf", scale=1, opacity=1, x=0, y=-140, locked=true, animation=.18,
-    hover=true, delay=.28, happiness=true, training=true, ammo=true, sound=true, petDeath=true, petHealth=true,
+    hover=true, pinnedOpen=false, delay=.28, happiness=true, training=true, ammo=true, sound=true, petDeath=true, petHealth=true,
     warning=300, critical=200, price=1000, priority="lowlevel", confirmation=true,
     modules={happiness=true, feed=true, training=true, ammo=true}, protected={}}
 P.colors = { [1]={.98,.29,.34}, [2]={.95,.68,.26}, [3]={.34,.85,.66},

@@ -1,4 +1,4 @@
-# Training guide — 1.6.6
+# Training guide — 1.6.7
 
 ## How it works
 
@@ -35,7 +35,7 @@ These are Classic reference positions, not confirmed Forever sightings. Personal
 
 ## Validation
 
-Tests/validate.py compiles every Lua file with Lua 5.1, loads the TOC under a deterministic API mock, runs 67 existing and 51 guide tests, and verifies image assets. Guide tests cover every catalog source ID and compressed coordinate, separate hunter knowledge, family/level/points/slots, personal overrides, trainer offers, learning messages, tooltip deduplication, zone filtering, nearest-point logic, factions, level-up baseline/combat/temporary pets and the guide window.
+Tests/validate.py compiles every Lua file with Lua 5.1, loads the TOC under a deterministic API mock, runs 67 existing and 60 guide tests, and verifies image assets. Guide tests cover every catalog source ID and compressed coordinate, separate hunter knowledge, family/level/points/slots, personal overrides, trainer offers, learning messages, tooltip deduplication, zone filtering, nearest-point logic, factions, level-up baseline/combat/temporary pets and the guide window.
 
 These checks do not emulate Blizzard secure execution or prove in-game appearance. Test the first real level-up, learning message, stable interaction, tooltip and map action in the Forever client after a full restart.
 

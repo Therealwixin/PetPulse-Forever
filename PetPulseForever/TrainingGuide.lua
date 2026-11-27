@@ -48,9 +48,11 @@ function G:ScanHunter()
     for _,rank in pairs(self.bySpell) do
         if rank.learn_id then
             local a=P.Call("IsPlayerSpell",rank.learn_id)
-            local b=P.Call("C_SpellBook.IsSpellKnown",rank.learn_id)
-            if a==true or b==true then self:Remember(rank)
-            elseif a==false or b==false then self.knownNow[rank.spell_id]=false end
+            local bank=Enum and Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Player
+            local b=P.Call("C_SpellBook.IsSpellKnown",rank.learn_id,bank)
+            local c=P.Call("IsSpellKnown",rank.learn_id,false)
+            if a==true or b==true or c==true then self:Remember(rank)
+            elseif a==false or b==false or c==false then self.knownNow[rank.spell_id]=false end
         end
     end
 end
@@ -62,8 +64,20 @@ function G:ReadPetSpells()
     for i=1,n do
         local id,passive
         local info=bank and P.Call("C_SpellBook.GetSpellBookItemInfo",i,bank)
-        if type(info)=="table" then id=P.Plain(info.spellID);passive=P.Plain(info.isPassive)
-        else local _,raw=P.Call("GetSpellBookItemInfo",i,BOOKTYPE_PET or "pet");if type(raw)=="number" then id=raw%16777216 end end
+        if type(info)=="table" then
+            id=P.Plain(info.spellID);passive=P.Plain(info.isPassive)
+            -- Pet actions may expose only actionID, with pet-action flags in the high byte.
+            if type(id)~="number" then
+                local raw=P.Plain(info.actionID)
+                if type(raw)=="number" then id=raw%16777216 end
+            end
+        end
+        if type(id)~="number" then
+            local _,raw=P.Call("GetSpellBookItemInfo",i,BOOKTYPE_PET or "pet")
+            if type(raw)=="number" then id=raw%16777216 end
+        end
+        -- A partially unavailable book must not overwrite the last complete snapshot.
+        if type(id)~="number" then return end
         if id then
             local rank=self.bySpell[id]
             if rank then
@@ -311,6 +325,13 @@ function G:Detect(unit)
     local id=self:NPCID(P.Call("UnitGUID",unit));if not id or not P.guideNPCs[id] then return end
     self:ReadLore(unit,id)
     if not self:Store().alerts then return end
+    local pet=self:Focus()
+    if pet and pet.guid==P.Call("UnitGUID","pet") then
+        local spells,active=self:ReadPetSpells()
+        if not spells then return end
+        pet.spells=spells;pet.active=active
+    end
+    self:ScanHunter()
     local level=P.Call("UnitLevel",unit);local player=P.Call("UnitLevel","player")
     if type(level)~="number" or level<1 or not player or level>player then return end
     local upgrades={}
